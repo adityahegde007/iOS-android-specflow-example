@@ -40,10 +40,10 @@ jobs:
       npm install appium@1.16.0 -g
     displayName: 'Install Appium 1.16.0'
 
-  - task: tsuyoshiushio.shell-exec.shellexec.shellexec@0
+  - task: CmdLine@2
     displayName: 'Install Android Studio for skins'
     inputs:
-      code: 'HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-studio'
+     script: 'HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-studio'
 
   - template: templates/install-cake.yml
 
@@ -53,10 +53,10 @@ jobs:
       script: 'dotnet-cake --target=AndroidEmulatorAcceptanceTests --emulator-api-level=25 --apk-path="$(System.DefaultWorkingDirectory)/apps/com.xamarin.acquaintnative.apk"'
     continueOnError: true
 
-  - task: tsuyoshiushio.shell-exec.shellexec.shellexec@0
+  - task: CmdLine@2
     displayName: 'Invoke Specflow HTML Report Generator'
     inputs:
-      code: |
+      script:
         cd $(System.DefaultWorkingDirectory)/IosAndroidSpecflowExample.AcceptanceTests/HtmlReporting
         
         npm install --loglevel=error
@@ -64,7 +64,7 @@ jobs:
         node index.js --jsonFile=$(System.DefaultWorkingDirectory)/IosAndroidSpecflowExample.AcceptanceTests/bin/Release/netcoreapp3.0/TestReports.json --outputHtml=SpecflowReports.html --name="Android Acceptance Tests"
         
         cd $(System.DefaultWorkingDirectory)
-      condition: succeededOrFailed()
+    condition: succeededOrFailed()
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: Json Reports'
